@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<addOn>
+  <identifier>e5abb292-4a80-11e4-9553-005056977bd0</identifier>
+  <displayType>Collection</displayType>
+  <translatedDisplayType>
+    <en_US>Collection</en_US>
+    <es_ES>Collection</es_ES>
+    <es_MX>Collection</es_MX>
+    <ja_JP>コレクション</ja_JP>
+    <ko_KR>컬렉션</ko_KR>
+    <zh_CN>集合</zh_CN>
+  </translatedDisplayType>
+  <name>Chebfun - current version</name>
+  <author>Chebfun Team</author>
+  <version>5.6.0.0</version>
+  <downloadUrl>https://www.mathworks.com/matlabcentral/mlc-downloads/downloads/e5abb292-4a80-11e4-9553-005056977bd0/d3323a9d-1c0f-f373-1ffc-69bab360c2c3/packages/zip?src=addons_ml_desktop_install&amp;profile_id=7538414&amp;license=834455&amp;release_family=R2022b</downloadUrl>
+  <licenseUrl>https://addons.mathworks.com/registry/v1/e5abb292-4a80-11e4-9553-005056977bd0/5.6.0.0/-/license</licenseUrl>
+  <previewImageUrl>https://www.mathworks.com/responsive_image/160/120/0/0/0/cache/matlabcentral/mlc-downloads/downloads/submissions/47023/versions/6/screenshot.jpg</previewImageUrl>
+  <releaseNotesUrl>https://www.mathworks.com/add-ons/e5abb292-4a80-11e4-9553-005056977bd0/d3323a9d-1c0f-f373-1ffc-69bab360c2c3/releaseNotes</releaseNotesUrl>
+  <installationFolder>Collections</installationFolder>
+</addOn>
