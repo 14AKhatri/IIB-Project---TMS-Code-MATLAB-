@@ -1,5 +1,7 @@
 %% Script to draft different optimisation functions
 
+%existing optimisation code - unchanges
+
 myresid = @(myccsum) sum((app.A_Aim - sum( repmat( reshape( myccsum(:),1,1,length(myccsum) ), size(app.A_modes,1), size(app.A_modes,2), 1).*app.A_modes, 3)).^2, "all");
 % "@(myccsum) -defines anonymous function- indicated that myccsum is input
 % variable
