@@ -30,14 +30,13 @@ disp(['Data type: ', num2str(hdr.datatype)]); %%data type 2 corresponds to uint8
 [i, j, k] = ndgrid(0:hdr.dim(2)-1, 0:hdr.dim(3)-1, 0:hdr.dim(4)-1);
 
 % Apply the affine transformation
-% xx = hdr.sform(1,1) * i + hdr.sform(1,2) * j + hdr.sform(1,3) * k + hdr.sform(1,4);  %%first row of sform
-% yy = hdr.sform(2,1) * i + hdr.sform(2,2) * j + hdr.sform(2,3) * k + hdr.sform(2,4);  %%second row of sform
-% zz = hdr.sform(3,1) * i + hdr.sform(3,2) * j + hdr.sform(3,3) * k + hdr.sform(3,4);  %%third row of sform
-
-
-xx = hdr.qform(1,1) * i + hdr.qform(1,2) * j + hdr.qform(1,3) * k + hdr.qform(1,4);  %%first row of sform
-yy = hdr.qform(2,1) * i + hdr.qform(2,2) * j + hdr.qform(2,3) * k + hdr.qform(2,4);  %%second row of sform
-zz = hdr.qform(3,1) * i + hdr.qform(3,2) * j + hdr.qform(3,3) * k + hdr.qform(3,4);  %%third row of sform
+xx = hdr.sform(1,1) * i + hdr.sform(1,2) * j + hdr.sform(1,3) * k + hdr.sform(1,4);  %%first row of sform
+yy = hdr.sform(2,1) * i + hdr.sform(2,2) * j + hdr.sform(2,3) * k + hdr.sform(2,4);  %%second row of sform
+zz = hdr.sform(3,1) * i + hdr.sform(3,2) * j + hdr.sform(3,3) * k + hdr.sform(3,4);  %%third row of sform
+% 
+% xx = hdr.qform(1,1) * i + hdr.qform(1,2) * j + hdr.qform(1,3) * k + hdr.qform(1,4);  %%first row of sform
+% yy = hdr.qform(2,1) * i + hdr.qform(2,2) * j + hdr.qform(2,3) * k + hdr.qform(2,4);  %%second row of sform
+% zz = hdr.qform(3,1) * i + hdr.qform(3,2) * j + hdr.qform(3,3) * k + hdr.qform(3,4);  %%third row of sform
 %%
 % Define which slices you want to plot
 % These can be changed based on the size of your volume
@@ -90,34 +89,34 @@ title('Axial Slice 6');
 
 %% 
 
- % Flatten the 3D volume data and voxel coordinates for scatter3
-%[x, y, z] = ndgrid(1:size(hdr.vol, 1), 1:size(hdr.vol, 2), 1:size(hdr.vol, 3));
-values = hdr.vol(:);  % Flatten the volume data to a vector
-%x = x(:); y = y(:); z = z(:);  % Flatten coordinates to vectors
-
-max(values)
-min(values)
-
-% Filter out zero or low-intensity values (optional)
-threshold = 0.1 %0.1 * max(values);  % Set a threshold as needed
-valid = values > threshold;  % Logical indexing for valid data points
-x = xx(valid); y = yy(valid); z = zz(valid);
-values = values(valid);
-
-% Normalize the values for color mapping (0 to 1 range)
-normalizedValues = (values - min(values)) / (max(values) - min(values));
-
-% Plot using scatter3 with color mapped to the magnitude of each point
-figure;
-scatter3(x, y, z, 10, values, 'filled');  % Adjust size (20) as needed
-colormap hot;  % Use the 'hot' colormap as specified
-colorbar;  % Display color scale
-xlabel('X');
-ylabel('Y');
-zlabel('Z');
-title('Scalar Field Visualization (Dot Plot with Color Mapping)');
-axis tight;
-%grid on;
+%  % Flatten the 3D volume data and voxel coordinates for scatter3
+% %[x, y, z] = ndgrid(1:size(hdr.vol, 1), 1:size(hdr.vol, 2), 1:size(hdr.vol, 3));
+% values = hdr.vol(:);  % Flatten the volume data to a vector
+% %x = x(:); y = y(:); z = z(:);  % Flatten coordinates to vectors
+% 
+% max(values)
+% min(values)
+% 
+% % Filter out zero or low-intensity values (optional)
+% threshold = 0.1 %0.1 * max(values);  % Set a threshold as needed
+% valid = values > threshold;  % Logical indexing for valid data points
+% x = xx(valid); y = yy(valid); z = zz(valid);
+% values = values(valid);
+% 
+% % Normalize the values for color mapping (0 to 1 range)
+% normalizedValues = (values - min(values)) / (max(values) - min(values));
+% 
+% % Plot using scatter3 with color mapped to the magnitude of each point
+% figure;
+% scatter3(x, y, z, 10, values, 'filled');  % Adjust size (20) as needed
+% colormap hot;  % Use the 'hot' colormap as specified
+% colorbar;  % Display color scale
+% xlabel('X');
+% ylabel('Y');
+% zlabel('Z');
+% title('Scalar Field Visualization (Dot Plot with Color Mapping)');
+% axis tight;
+% %grid on;
 
 
 %%
@@ -260,7 +259,7 @@ if isfield(hdr, 'vol') && ~isempty(hdr.vol)
     % Apply the affine transformation (hdr.sform) to get real-world coordinates
     % Voxel coordinates are in [x, y, z, 1] homogeneous coordinates.
     % The sform matrix is a 4x4 matrix
-    realCoords = hdr.sform * [x, y, z, ones(length(x), 1)]';  % Apply the transformation
+    realCoords = hdr.sform * [x, y, z, ones(length(x), 1)]';  % Apply the sform transformation
     realX = realCoords(1, :);  % Extract real-world x coordinates
     realY = realCoords(2, :);  % Extract real-world y coordinates
     realZ = realCoords(3, :);  % Extract real-world z coordinates
