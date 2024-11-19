@@ -1,4 +1,4 @@
-function [my_sup,my_dir,lookup] = planarmode(gridsize,planarsize,m_max,n_max,coillift,my_rot)
+function [my_sup,my_dir,lookup,lookupinv] = planarmode(gridsize,planarsize,m_max,n_max,coillift,my_rot)
 
 d=[0; 0; 1]; %Normalenvektor zur Ebene
 
@@ -17,6 +17,7 @@ for m=1:m_max
         
         lookup(ii,1)= m;
         lookup(ii,2)= n;
+        lookupinv(m,n) = ii;
         ii=ii+1;
         
         for i=1:gridsize
