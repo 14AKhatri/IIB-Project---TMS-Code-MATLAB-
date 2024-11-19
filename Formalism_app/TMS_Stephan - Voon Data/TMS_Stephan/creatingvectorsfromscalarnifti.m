@@ -73,7 +73,7 @@ else
 end
 
 %%
-%%
+%% Plot (quiver) the gradient values using real coordinates
 if isfield(hdr, 'vol') && ~isempty(hdr.vol)
 
     [dimX, dimY, dimZ] = size(hdr.vol);
@@ -104,8 +104,6 @@ if isfield(hdr, 'vol') && ~isempty(hdr.vol)
     % gradY = gradY ./ magnitude;
     % gradZ = gradZ ./ magnitude;
 
-
-
     % Only plot non-zero voxel data
     nonZeroIdx = voxelData ~= 0;
     realXNonZero = realX(nonZeroIdx);
@@ -116,8 +114,7 @@ if isfield(hdr, 'vol') && ~isempty(hdr.vol)
     % % Create a 3D scatter plot with reduced marker size
     figure;
     % scatter3(realXNonZero, realYNonZero, realZNonZero, 1, voxelDataNonZero, 'filled');
-    
-
+ 
 
     % % Add gradient vectors as TMS targets
     % quiver3(realX, realY, realZ, gradX, gradY, gradZ, 0.5, 'Color', 'k', 'LineWidth', 1);
@@ -144,7 +141,6 @@ if isfield(hdr, 'vol') && ~isempty(hdr.vol)
 else
     error('hdr.vol is either missing or empty. Please check the hdr structure.');
 end
-
 %% 
 % Plot gradient magnitudes against voxel positions
 gradMagnitude = sqrt(gradX(:).^2 + gradY(:).^2 + gradZ(:).^2);
@@ -212,14 +208,62 @@ if isfield(hdr, 'vol') && ~isempty(hdr.vol)
     end
 
     % Visualization
-    figure;
-    slice = round(dimZ / 2);  % Select a middle slice for visualization
-    imagesc(correlationMap(:, :, slice));  % Display correlation for the middle slice
-    colorbar;
-    title('Correlation of Gradient Vectors with Adjacent Voxels');
-    xlabel('X');
-    ylabel('Y');
+    % figure;
+    % slice = round(dimZ / 2);  % Select a middle slice for visualization
+    % imagesc(correlationMap(:, :, slice));  % Display correlation for the middle slice
+    % colorbar;
+    % title('Correlation of Gradient Vectors with Adjacent Voxels');
+    % xlabel('X');
+    % ylabel('Y');
+
+    % 3D Visualization using volshow (requires Image Processing Add-On)
+    %volshow(correlationMap, 'Colormap', jet(256), 'Alphamap', linspace(0, 1, 256));
+    volshow(correlationMap, 'Colormap', hot(256),'Alphamap', linspace(0, 1, 256));  % Example for "hot" colormap
 
 else
     error('hdr.vol is either missing or empty. Please check the hdr structure.');
 end
+
+%% Gradient Coherence
+
+%Compute the six unique components of the structure tensor and smooth them (e.g., using a Gaussian filter)
+T11 = imgaussfilt3(gradX.^2, 1);  % <g_x^2>
+T22 = imgaussfilt3(gradY.^2, 1);  % <g_y^2>
+T33 = imgaussfilt3(gradZ.^2, 1);  % <g_z^2>
+T12 = imgaussfilt3(gradX .* gradY, 1);  % <g_x * g_y>
+T13 = imgaussfilt3(gradX .* gradZ, 1);  % <g_x * g_z>
+T23 = imgaussfilt3(gradY .* gradZ, 1);  % <g_y * g_z>
+
+% Preallocate coherence map
+[dimX, dimY, dimZ] = size(hdr.vol);
+coherence = zeros(dimX, dimY, dimZ);
+
+% Loop through each voxel to compute coherence
+for x = 2:dimX-1
+    for y = 2:dimY-1
+        for z = 2:dimZ-1
+            % Extract structure tensor components at this voxel
+            T = [
+                T11(x, y, z), T12(x, y, z), T13(x, y, z);
+                T12(x, y, z), T22(x, y, z), T23(x, y, z);
+                T13(x, y, z), T23(x, y, z), T33(x, y, z)
+            ];
+
+            % Compute eigenvalues of the structure tensor
+            eigenValues = eig(T);
+
+            % Sort eigenvalues (ensure lambda1 >= lambda2 >= lambda3)
+            eigenValues = sort(eigenValues, 'descend');
+            lambda1 = eigenValues(1);
+            lambda2 = eigenValues(2);
+            lambda3 = eigenValues(3);
+
+            % Compute coherence measure
+            coherence(x, y, z) = (lambda1 - lambda2) / (lambda1 + lambda2 + lambda3 + eps);
+        end
+    end
+end
+
+volshow(coherence, 'Colormap', parula(256));
+
+
