@@ -42,39 +42,77 @@ volshow(masked_brain);
 %% 
 %% 
 
-% Define the structuring element (sphere for radial extension)
-% The radius of the sphere determines how far the ROI will extend.
-radius = 5; % Radius in voxels for radial extension
-se = strel('sphere', radius);
-
-% Perform dilation on the ROI
-extended_ROI = imdilate(ROI > 0, se);
-
-% Overlay the extended ROI on the brain model
-brain_overlay = brainmodel; 
-brain_overlay(extended_ROI > 0) = max(brain_overlay(:)); % Highlight extended ROI
-
-% Use volshow to visualize the result
-volshow(brain_overlay);
-
-
-
+% % Define the structuring element (sphere for radial extension)
+% % The radius of the sphere determines how far the ROI will extend.
+% radius = 6; % Radius in voxels for radial extension
+% se = strel('sphere', radius);
+% 
+% % Perform dilation on the ROI
+% extended_ROI = imdilate(ROI > 0, se);
+% 
+% % Overlay the extended ROI on the brain model
+% brain_overlay = brainmodel; 
+% brain_overlay(extended_ROI > 0) = max(brain_overlay(:)); % Highlight extended ROI
+% 
+% % Use volshow to visualize the result
+% volshow(brain_overlay);
 
 %% 
-% Input: ROI (binary mask where ROI = 1, background = 0)
 
-% Compute the distance transform from both inside and outside the ROI
-distance_out = bwdist(ROI == 0); % Distance of background voxels to ROI boundary
-distance_in = bwdist(ROI == 1);  % Distance of ROI voxels to background
+% Assume `mask` is the binary ROI mask (1 for ROI, 0 elsewhere)
+% `origin` is the brain origin (e.g., center of the brain volume)
+origin = [size(mask, 1)/2, size(mask, 2)/2, size(mask, 3)/2]; % Brain center
+[roi_x, roi_y, roi_z] = ind2sub(size(mask), find(mask > 0)); % ROI voxel coordinates
 
-% Specify the radial distance for inward and outward extension (in voxels)
-radial_distance = 10; % Adjust based on desired distance
+% Calculate the ROI centroid
+roi_centroid = mean([roi_x, roi_y, roi_z], 1);
 
-% Create the extended ROI
-extended_ROI = (distance_out <= radial_distance) | (distance_in <= radial_distance);
+% Parameters for the cone
+cone_height = 10; % Height of the cone (in voxels)
+max_cone_radius = 5; % Maximum radius of the cone at its farthest extent
 
-% Visualization
-volshow(extended_ROI);
+% Create a new mask for the extended ROI
+extended_mask = mask;
+
+% Loop through each voxel in the ROI
+for i = 1:length(roi_x)
+    % Current voxel position
+    voxel_pos = [roi_x(i), roi_y(i), roi_z(i)];
+    
+    % Compute radial direction vector from ROI centroid
+    radial_vector = voxel_pos - roi_centroid;
+    radial_vector = radial_vector / norm(radial_vector); % Normalize to unit vector
+    
+    % Step outward to extend in a cone shape
+    for step = 1:cone_height
+        % Compute the current cone radius
+        current_radius = (step / cone_height) * max_cone_radius;
+        
+        % Compute the new voxel position along the radial vector
+        new_pos = voxel_pos + step * radial_vector;
+        
+        % Check all voxels within the current radius of the cone slice
+        [x_sphere, y_sphere, z_sphere] = ndgrid(-current_radius:current_radius, ...
+                                                -current_radius:current_radius, ...
+                                                -current_radius:current_radius);
+        sphere_voxels = [x_sphere(:), y_sphere(:), z_sphere(:)];
+        sphere_voxels = sphere_voxels(vecnorm(sphere_voxels, 2, 2) <= current_radius, :);
+        
+        % Translate sphere voxels to new position and update mask
+        for j = 1:size(sphere_voxels, 1)
+            voxel = round(new_pos + sphere_voxels(j, :));
+            if all(voxel > 0) && voxel(1) <= size(mask, 1) && ...
+               voxel(2) <= size(mask, 2) && voxel(3) <= size(mask, 3)
+                extended_mask(voxel(1), voxel(2), voxel(3)) = 1;
+            end
+        end
+    end
+end
+
+% Visualize the extended ROI (cone shape)
+volshow(extended_mask);
+
+
 
 
 
@@ -148,7 +186,7 @@ quiver3(sampled_centroids(:,1), sampled_centroids(:,2), sampled_centroids(:,3), 
 
 %% Only want the ones in the ROI
 
-mask = extended_ROI;  % Mask for ROI
+mask = ROI;  % Mask for ROI
 roi_normals = []; 
 roi_face_centroids = [];
 
@@ -159,7 +197,11 @@ for i = 1:size(faces, 1)
     % Convert the vertex coordinates to voxel indices (rounded to nearest voxel)
     voxel_indices = round(face_vertices);
     voxel_indices = max(min(voxel_indices, size(mask)), 1);  % Ensure valid indices
-    
+    % Convert the face vertex coordinates (in mm) to voxel indices, accounting for 2mm voxel size
+
+
+
+
     % Check if the vertices of the current face lie within the ROI (mask)
     mask_values = mask(sub2ind(size(mask), voxel_indices(:,1), voxel_indices(:,2), voxel_indices(:,3)));
     
