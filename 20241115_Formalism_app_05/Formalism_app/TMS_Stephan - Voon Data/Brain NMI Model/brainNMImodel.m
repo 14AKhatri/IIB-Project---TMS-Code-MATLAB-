@@ -1,3 +1,14 @@
+
+
+% This code opens up the NMI brain model, and calculated the gradient coherence. 
+% Gyri and Sulci are determined by thresholding the gradient coherence values
+% An isosurface is then found, and from which perpendicular vectors are determind. There are some drawbacks to this method:
+% The vectors don't span then entire area - where there is not a gyri, there is no vector.
+
+
+
+%% 
+
 % Load NIfTI file for the Brain model data
 [fileName, filePath] = uigetfile('*.nii', 'Select a NIfTI file');
 if fileName ~= 0
