@@ -124,7 +124,7 @@ title('Axial Slice 6');
 
 % Flatten the volume data into a 1D array
 voxelData = hdr.vol(:);
-len = length(voxelData)
+len = length(voxelData);
 b = linspace(0, length(voxelData),length(voxelData))
 scatter(b,voxelData);
 
