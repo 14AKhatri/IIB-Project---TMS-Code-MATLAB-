@@ -29,7 +29,7 @@ end
 %define the relevant brain region using the mask
 brainmodel = hdr.vol;
 mask = hdr_mask.vol;
-brainmodel(mask == 0) = brainmodel(mask == 0) * 0.1; %for visualisation purposes
+brainmodel(mask == 0) = brainmodel(mask == 0) * 0.5; %for visualisation purposes
 volData = brainmodel;
 volshow(volData);
 
@@ -119,14 +119,14 @@ volshow(extended_mask);
 
 %% 
 
-brainmodel = hdr.vol;  % Brain volume data
-% tbrain = brainmodel > 0.1; %makes all the voxels 1
-% tbrain = ROI>0;
-tbrain = (brainmodel > 0.1) | (ROI > 0);
+% brainmodel = hdr.vol;  % Brain volume data
+% % tbrain = brainmodel > 0.1; %makes all the voxels 1
+% % tbrain = ROI>0;
+% tbrain = (brainmodel > 0.1) | (ROI > 0);
+% 
+% volshow(tbrain);
 
-volshow(tbrain);
-
-[faces, vertices] = isosurface(tbrain);
+[faces, vertices] = isosurface(brainmodel);
 
 %% 
 % Plot the isosurface
@@ -185,33 +185,81 @@ quiver3(sampled_centroids(:,1), sampled_centroids(:,2), sampled_centroids(:,3), 
 
 
 %% Only want the ones in the ROI
-
+% 
+% mask = ROI;  % Mask for ROI
+% roi_normals = []; 
+% roi_face_centroids = [];
+% 
+% % Iterating through each face
+% for i = 1:size(faces, 1)
+%     face_vertices = vertices(faces(i,:), :); %real coordinates of vertices
+% 
+%     % Convert the vertex coordinates to voxel indices (rounded to nearest voxel)
+%     voxel_indices = round(face_vertices);
+%     voxel_indices = max(min(voxel_indices, size(mask)), 1);  % Ensure valid indices
+%     % Convert the face vertex coordinates (in mm) to voxel indices, accounting for 2mm voxel size
+% 
+% 
+% 
+% 
+%     % Check if the vertices of the current face lie within the ROI (mask)
+%     mask_values = mask(sub2ind(size(mask), voxel_indices(:,1), voxel_indices(:,2), voxel_indices(:,3)));
+% 
+%     % If all vertices in the face are inside the mask, add the normal vector
+%     if all(mask_values == 1)
+%         roi_normals = [roi_normals; normals(i, :)];
+%         face_centroid = mean(face_vertices, 1);  
+%         roi_face_centroids = [roi_face_centroids; face_centroid];
+%     end
+% end
+%% 
 mask = ROI;  % Mask for ROI
 roi_normals = []; 
 roi_face_centroids = [];
 
+% Define the neighborhood range (in voxels)
+neighborhood = 3;
+
+% Get the size of the mask for boundary checks
+mask_size = size(mask);
+
 % Iterating through each face
 for i = 1:size(faces, 1)
-    face_vertices = vertices(faces(i,:), :); %real coordinates of vertices
+    face_vertices = vertices(faces(i, :), :); % Real coordinates of vertices
     
     % Convert the vertex coordinates to voxel indices (rounded to nearest voxel)
     voxel_indices = round(face_vertices);
-    voxel_indices = max(min(voxel_indices, size(mask)), 1);  % Ensure valid indices
-    % Convert the face vertex coordinates (in mm) to voxel indices, accounting for 2mm voxel size
+    voxel_indices = max(min(voxel_indices, mask_size), 1);  % Ensure valid indices
 
-
-
-
-    % Check if the vertices of the current face lie within the ROI (mask)
-    mask_values = mask(sub2ind(size(mask), voxel_indices(:,1), voxel_indices(:,2), voxel_indices(:,3)));
+    % Check if any vertex is within two voxels of the ROI
+    in_roi = false;  % Initialize flag for proximity to ROI
+    for j = 1:size(voxel_indices, 1)
+        % Extract the current voxel index
+        vx = voxel_indices(j, 1);
+        vy = voxel_indices(j, 2);
+        vz = voxel_indices(j, 3);
+        
+        % Define the range for checking neighborhood
+        x_range = max(vx - neighborhood, 1):min(vx + neighborhood, mask_size(1));
+        y_range = max(vy - neighborhood, 1):min(vy + neighborhood, mask_size(2));
+        z_range = max(vz - neighborhood, 1):min(vz + neighborhood, mask_size(3));
+        
+        % Check if any voxel in the neighborhood is part of the ROI
+        if any(mask(x_range, y_range, z_range), 'all')
+            in_roi = true;
+            break;  % Exit loop early if proximity is confirmed
+        end
+    end
     
-    % If all vertices in the face are inside the mask, add the normal vector
-    if all(mask_values == 1)
+    % If the face is near the ROI, add its normal vector and centroid
+    if in_roi
         roi_normals = [roi_normals; normals(i, :)];
         face_centroid = mean(face_vertices, 1);  
         roi_face_centroids = [roi_face_centroids; face_centroid];
     end
 end
+
+
 
 
 %% find the average of the vectors in the ROI
@@ -224,7 +272,7 @@ set(k, 'FaceColor', 'red', 'EdgeColor', 'none', 'FaceAlpha', 0.1);  % Adjust tra
 xlabel('X');
 ylabel('Y');
 zlabel('Z');
-title('Binary Field Visualization (Isosurface)');
+title('Plot of Vectors normal to ROI');
 axis equal;
 grid on;
 view(3); %3D view
