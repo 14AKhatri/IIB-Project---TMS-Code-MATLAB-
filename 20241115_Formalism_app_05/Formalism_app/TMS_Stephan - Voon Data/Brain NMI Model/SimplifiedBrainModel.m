@@ -1,8 +1,7 @@
 %This code attempts to identify the vector direction as outlined by S.Goetz
+% on 21/11/2024
 
-
-%% 
-% Load NIfTI file for the Brain model data
+%% Load NIfTI file for the Brain model data - use the 2mm Brain model for comparison with Voon Data
 [fileName, filePath] = uigetfile('*.nii', 'Select a NIfTI file');
 if fileName ~= 0
     fullFilePath = fullfile(filePath, fileName);
@@ -13,7 +12,7 @@ if fileName ~= 0
 else
     disp('File selection canceled.');
 end
-%% Load NIfTI file for the amydala ROI (Voon Data)
+%% Load NIfTI file for the DLPFC ROI MASK (Voon Data)
 [fileName_mask, filePath_mask] = uigetfile('*.nii', 'Select a NIfTI file');
 if fileName_mask ~= 0
     filePath_mask = fullfile(filePath_mask, fileName_mask);
@@ -29,19 +28,18 @@ end
 %define the relevant brain region using the mask
 brainmodel = hdr.vol;
 mask = hdr_mask.vol;
-brainmodel(mask == 0) = brainmodel(mask == 0) * 0.5; %for visualisation purposes
+brainmodel(mask == 0) = brainmodel(mask == 0) * 0.1; %for visualisation - makes the NOT ROI darker
 volData = brainmodel;
 volshow(volData);
 
-%% 
-binary_mask = mask ~= 0; %this should be the same as mask if a mask is used
+%% Generate a Binary Mask
+% This is redundant is the DLPFC mask is used.
+binary_mask = mask ~= 0; % should be the same as mask if a mask is used 
 ROI = binary_mask;
-volshow(ROI);
-masked_brain = brainmodel .* mask;
-volshow(masked_brain);
+%volshow(ROI);
+% masked_brain = brainmodel .* mask; % same as mask
+%volshow(masked_brain); 
 %% 
-%% 
-
 % % Define the structuring element (sphere for radial extension)
 % % The radius of the sphere determines how far the ROI will extend.
 % radius = 6; % Radius in voxels for radial extension
@@ -58,8 +56,7 @@ volshow(masked_brain);
 % volshow(brain_overlay);
 
 %% 
-
-% Assume `mask` is the binary ROI mask (1 for ROI, 0 elsewhere)
+% Assumes `mask` is the binary ROI mask (1 for ROI, 0 elsewhere)
 % `origin` is the brain origin (e.g., center of the brain volume)
 origin = [size(mask, 1)/2, size(mask, 2)/2, size(mask, 3)/2]; % Brain center
 [roi_x, roi_y, roi_z] = ind2sub(size(mask), find(mask > 0)); % ROI voxel coordinates
@@ -125,7 +122,7 @@ volshow(extended_mask);
 % tbrain = (brainmodel > 0.1) | (ROI > 0);
 % 
 % volshow(tbrain);
-
+volshow(brainmodel);
 [faces, vertices] = isosurface(brainmodel);
 
 %% 
