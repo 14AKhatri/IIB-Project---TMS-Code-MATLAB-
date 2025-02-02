@@ -30,9 +30,12 @@ brainmodel = hdr.vol;
 mask = hdr_mask.vol;
 % volshow(brainmodel);
 %% 
-brainmodel(mask == 0) = brainmodel(mask == 0) * 0.1; %for visualisation - makes the NOT ROI darker
+% brainmodel(mask == 0) = brainmodel(mask == 0) * 10; %for visualisation - makes the NOT ROI darker
+brainmodel(mask == 1) = brainmodel(mask == 1) * 3;
 volData = brainmodel;
-volshow(volData);
+viewer = volshow(volData,RenderingStyle="VolumeRendering");
+viewer.Parent.BackgroundColor = [1 1 1];
+
 
 %% Generate a Binary Mask
 % This is redundant is the DLPFC mask is used.
@@ -204,7 +207,7 @@ normal_y = normal_y ./ norms;
 normal_z = normal_z ./ norms;
 
 figure;
-quiver3(x, y, z, normal_x, normal_y, normal_z, 0.5, 'r'); % Adjust scaling
+quiver3(x, y, z, normal_x, normal_y, normal_z, 2, 'r'); % Adjust scaling
 xlabel('X');
 ylabel('Y');
 zlabel('Z');
@@ -229,4 +232,12 @@ filt_norms = sqrt(sum_norm_x.^2 + sum_norm_y.^2 + sum_norm_z.^2);
 av_norm_x = sum_norm_x ./ filt_norms;
 av_norm_y = sum_norm_y ./ filt_norms;
 av_norm_z = sum_norm_z ./ filt_norms;
-disp([av_norm_x,av_norm_y,av_norm_z]);
+
+real_coord = hdr.sform * [av_norm_x,av_norm_y,av_norm_z,1]'
+%disp([av_norm_x,av_norm_y,av_norm_z]);
+disp(real_coord);
+
+real_vec = [real_coord(1,:),real_coord(2,:),real_coord(3,:)];
+norm = vecnorm(real_vec)
+real_vec = real_vec ./ norm;
+disp(real_vec);

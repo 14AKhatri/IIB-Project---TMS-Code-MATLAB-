@@ -291,9 +291,8 @@ if isfield(hdr, 'vol') && ~isempty(hdr.vol)
     hold on;  % Keep the plot open to add zero voxels
 
     % Plot zero voxel data with transparency (alpha = 0)
-    scatter3(realXZero, realYZero, realZZero, 10, 'r', 'filled', 'MarkerFaceAlpha', 0);  % Transparent red for zeros
+    % scatter3(realXZero, realYZero, realZZero, 10, 'r', 'filled', 'MarkerFaceAlpha', 0);  % Transparent red for zeros
 
-    % Customize the plot
     xlabel('X');
     ylabel('Y');
     zlabel('Z');

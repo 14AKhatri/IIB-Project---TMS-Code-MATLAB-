@@ -63,7 +63,8 @@ if isfield(hdr, 'vol') && ~isempty(hdr.vol)
     xlabel('X');
     ylabel('Y');
     zlabel('Z');
-    title('3D Plot of Voxel Values (Zero and Non-Zero)');
+    % title('3D Plot of Voxel Values (Zero and Non-Zero)');
+    title('3D Plot of Voxel Values using Real Coordinates (mm)');
     colorbar;  % Show color bar for non-zero voxel values
     axis equal;
     grid on;
