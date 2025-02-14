@@ -1,4 +1,4 @@
-%% Open closed loop coils and find the corresponding A-field
+%% Open closed loop coils (from the saved contours files) and find the corresponding A-field
 % load('closed_loop_data.mat');
 
 % loadedData = load('closed_loop_data.mat');

@@ -1,4 +1,4 @@
-% Load the Closed Loop Coils 
+% Load the Closed Loop Coils  - Open and recreate the coils 
 load('closed_loop_data.mat');
 
 % Assign back to app properties
