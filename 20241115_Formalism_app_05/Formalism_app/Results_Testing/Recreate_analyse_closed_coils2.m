@@ -1,8 +1,10 @@
 %% 04/03/2025 - Recreate closed loop coils (from the saved contours files) and find the corresponding A-field
 
 
-loadedData = load('25.02.2025_AMY_10M_200Plane_minvecoutsidetarget_coil.mat')' %w.500 iterations
+% loadedData = load('25.02.2025_AMY_10M_200Plane_minvecoutsidetarget_coil.mat')' %w.500 iterations
 
+
+loadedData = load('06.03.2025_CombTarg111_10M_200P_p1q1_200it_coil.mat') % combinedtarget111 Type 1 objectives, 
 %%
 app = loadedData.app_data_coil;
 contours = loadedData.contours;
@@ -320,24 +322,24 @@ disp(coil_field_energy_in_target_optscaled/coil_energy_optscaled);
 
 %% Plot the coil with the current distribution
 syms x y l m ps %symbolic variables - indicates that they are variables; m & l are mode numbers of sinusoidal functions; ps is planar surface size
-    Y(x,y,l,m,ps) = (sin(l*(x+ps/2)*pi/ps)).*(sin(m*(y+ps/2)*pi/ps)); % basis function for the current distribution;
-    Y_grad(x,y,l,m,ps) = [Y(x-0.5,y,l,m,ps)-Y(x+0.5,y,l,m,ps), Y(x,y-0.5,l,m,ps)-Y(x,y+0.5,l,m,ps), 0]; % gradient of basis function - vector field
-    
-    % symbolic functions are initialized
-    f_cd(x,y) = x + y;
-    f_cd(x,y) = 0;
-    f_grad(x,y) = x+y; %gradient component
-    f_grad(x,y) = 0;
+Y(x,y,l,m,ps) = (sin(l*(x+ps/2)*pi/ps)).*(sin(m*(y+ps/2)*pi/ps)); % basis function for the current distribution;
+% Y_grad(x,y,l,m,ps) = [Y(x-0.5,y,l,m,ps)-Y(x+0.5,y,l,m,ps), Y(x,y-0.5,l,m,ps)-Y(x,y+0.5,l,m,ps), 0]; % gradient of basis function - vector field
 
-    for m = 1:10
-        for n = 1:10
-            % Compute mode contribution using symbolic gradient
-            % f_cd = f_cd + app.CSUMM(app.lookupinv(m, n), app.Spinner.Value) * Y(x,y,m,n,app.PlanesizeEditField.Value);      
-            p = app.lookupinv(m, n);
-            f_cd = f_cd + app.opticoeff(app.lookupinv(m, n), 1) * Y(x,y,m,n,200);          
-        end
+% symbolic functions are initialized
+f_cd(x,y) = x + y;
+f_cd(x,y) = 0;
+f_grad(x,y) = x+y; %gradient component
+f_grad(x,y) = 0;
+
+for m = 1:10
+    for n = 1:10
+        % Compute mode contribution using symbolic gradient
+        % f_cd = f_cd + app.CSUMM(app.lookupinv(m, n), app.Spinner.Value) * Y(x,y,m,n,app.PlanesizeEditField.Value);      
+        p = app.lookupinv(m, n);
+        f_cd = f_cd + app.opticoeff(app.lookupinv(m, n), 1) * Y(x,y,m,n,200);          
     end
-    f_cd_numeric = matlabFunction(f_cd, 'Vars', [x, y]); %convert to Numerical Function - meant to be quicker; converting to double is also a numerical
+end
+f_cd_numeric = matlabFunction(f_cd, 'Vars', [x, y]); %convert to Numerical Function - meant to be quicker; converting to double is also a numerical
 
 %%  
 x_range = linspace(-200/2, 200/2, 100); % X-axis
