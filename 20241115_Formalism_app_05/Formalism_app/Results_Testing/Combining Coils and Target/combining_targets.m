@@ -43,7 +43,7 @@ data_FOX_tar = FOX_targ.vol;
 data_VMPFC_tar = VMPFC_targ.vol;
 
 %% Add the targets up --> Combined Target
-data_com_targ = data_amyg_tar + data_FOX_tar + data_VMPFC_tar;
+data_com_targ = data_VMPFC_tar;%data_amyg_tar; %+ data_FOX_tar + data_VMPFC_tar;
 
 %% Freq. Plot (to check)
 

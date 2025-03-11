@@ -2,7 +2,7 @@
 % load('closed_loop_data.mat');
 
 % loadedData = load('closed_loop_data.mat');
-loadedData = load('12.02.2025_run.mat');
+% loadedData = load('12.02.2025_run.mat');
 % app = loadedData.app;
 % Assign back to app properties
 % app.planarflag = planarflag;
@@ -14,9 +14,14 @@ loadedData = load('12.02.2025_run.mat');
 % app.my_coillift = my_coillift;
 % app.roi = roi_radius;
 % app.res = resolutions;
+%% 10/03/2025 - Analyse code for CombTarg
+% loadedData = load('08.03.2025_CombTarg_10M_200P_p1q2_infit_coil.mat');
+loadedData = load('07.03.2025_CombTarg_10M_200P_p1q2_400it_coil.mat');
+
 %%
-app = loadedData.app_data;
+app = loadedData.app_data_coil;
 contours = loadedData.contours;
+clear loadedData
 
 % Fill in missing Data - should not need these as sup & vol arrays are
 % filled

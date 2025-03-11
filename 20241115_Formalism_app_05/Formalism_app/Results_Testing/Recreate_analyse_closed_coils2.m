@@ -4,7 +4,17 @@
 % loadedData = load('25.02.2025_AMY_10M_200Plane_minvecoutsidetarget_coil.mat')' %w.500 iterations
 
 
-loadedData = load('06.03.2025_CombTarg111_10M_200P_p1q1_200it_coil.mat') % combinedtarget111 Type 1 objectives, 
+% loadedData = load('06.03.2025_CombTarg111_10M_200P_p1q1_200it_coil.mat') % combinedtarget111 Type 1 objectives, 
+
+% loadedData = load('07.03.2025_CombTarg_10M_200P_p1q2_400it_coil.mat')
+%loadedData = load('08.03.2025_CombTarg_10M_200P_p1q2_infit_coil.mat');
+
+% loadedData = load('07.03.2025_CombTarg_10M_200P_p2q1_400it_coil.mat'); %File Overwritten
+% loadedData = load('08.03.2025_CombTarg_10M_200P_p2q2_400it_coil.mat')
+
+loadedData = load('08.03.2025_CombTarg_10M_200P_p1qinf_1600it_coil.mat')
+
+
 %%
 app = loadedData.app_data_coil;
 contours = loadedData.contours;
