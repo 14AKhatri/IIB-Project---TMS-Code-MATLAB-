@@ -12,8 +12,11 @@
 % loadedData = load('07.03.2025_CombTarg_10M_200P_p2q1_400it_coil.mat'); %File Overwritten
 % loadedData = load('08.03.2025_CombTarg_10M_200P_p2q2_400it_coil.mat')
 
-loadedData = load('08.03.2025_CombTarg_10M_200P_p1qinf_1600it_coil.mat')
+% loadedData = load('08.03.2025_CombTarg_10M_200P_p1qinf_1600it_coil.mat')
 
+%% Post changed new target direction
+loadedData = load('12.03.2025_AMY_10M_200P_p1q2_newTarDir_600iter_EE_coil.mat'); % Amygdala target
+% loadedData = load('12.03.2025_FOX_10M_200P_p1q2_newTarDir_600iter_lap_coil.mat'); % FOX target
 
 %%
 app = loadedData.app_data_coil;
@@ -42,8 +45,7 @@ f_grad(x,y) = 0;
 for m = 1:10
     for n = 1:10
         % Compute mode contribution using symbolic gradient
-        % f_cd = f_cd + app.CSUMM(app.lookupinv(m, n), app.Spinner.Value) * Y(x,y,m,n,app.PlanesizeEditField.Value);      
-        p = app.lookupinv(m, n);
+        % f_cd = f_cd + app.CSUMM(app.lookupinv(m, n), 10) * Y(x,y,m,n,app.PlanesizeEditField.Value);      
         f_cd = f_cd + app.opticoeff(app.lookupinv(m, n), 1) * Y(x,y,m,n,app.PlanesizeEditField.Value);          
     end
 end
@@ -86,7 +88,9 @@ for i = 1:length(contours)
     contour_points = contours{i}.points;
     plot(contour_points(1, :), contour_points(2, :), 'b', 'LineWidth', 0.8);
 end
-title('Stream Function & Equally Spaced Coil Windings using Optimised Coefficients');
+%title('Stream Function & Equally Spaced Coil Windings using Optimised Coefficients');
+title('Post-Optimisation Current Distribution');
+% title('Pre-Optimisation Current Distribution');
 xlabel('X');
 ylabel('Y');
 axis equal;
