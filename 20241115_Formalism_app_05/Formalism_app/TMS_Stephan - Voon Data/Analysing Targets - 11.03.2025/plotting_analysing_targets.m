@@ -87,11 +87,11 @@ zlabel('Z');
 % title('3D Plot of Voxel Values (Zero and Non-Zero)');
 title('3D Plot of Voxel Values using Real Coordinates (mm)');
 
-% Adjust the color range to make it more extreme
+%Adjust the colour range
 minValue = min(voxelDataNonZero);
 maxValue = max(voxelDataNonZero);
 
-% Stretch the color range: Make the range more extreme
+
 caxis([minValue, maxValue * 0.15]);  % Control the data range mapped to colours
 colormap(jet);  % Change to jet colormap for a more vibrant color scheme
 
@@ -162,8 +162,8 @@ colorbar;  % Show color bar for non-zero voxel values
 axis equal;
 grid on;
 % 
-caxis([minValue, maxValue * 0.15]);  % Control the data range mapped to colours
-colormap(jet);
+caxis([minValue*100, maxValue ]);  % Control the data range mapped to colours
+colormap(flipud(jet   )    );
 
 axNew = gca;  % Get current axes handle for the new figure
 set(axNew, 'CameraPosition', camPos);

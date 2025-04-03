@@ -28,7 +28,7 @@ end
 %define the relevant brain region using the mask
 brainmodel = hdr.vol;
 mask = hdr_mask.vol;
-% volshow(brainmodel);
+volshow(brainmodel);
 %% 
 % brainmodel(mask == 0) = brainmodel(mask == 0) * 10; %for visualisation - makes the NOT ROI darker
 brainmodel(mask == 1) = brainmodel(mask == 1) * 3;

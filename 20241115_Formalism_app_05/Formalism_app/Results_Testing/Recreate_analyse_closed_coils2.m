@@ -15,9 +15,32 @@
 % loadedData = load('08.03.2025_CombTarg_10M_200P_p1qinf_1600it_coil.mat')
 
 %% Post changed new target direction
-loadedData = load('12.03.2025_AMY_10M_200P_p1q2_newTarDir_600iter_EE_coil.mat'); % Amygdala target
+% loadedData = load('12.03.2025_AMY_10M_200P_p1q2_newTarDir_600iter_EE_coil.mat'); % Amygdala target
 % loadedData = load('12.03.2025_FOX_10M_200P_p1q2_newTarDir_600iter_lap_coil.mat'); % FOX target
+%% Post new target direction + sform changes
+% loadedData = load('13.03.2025_AMY_10M_200P_p1q1_newTarDirNewSform_200iter_EE_coil.mat'); % Amygdala target
+% loadedData = load('13.03.2025_FOX_10M_200P_p1q1_newTarDirNewSform_200iter_EE_coil.mat');
 
+% loadedData = load('14.03.2025_AMY_10M_200P_p2q1_newTarDirNewSform_200iter_EE_coil.mat');
+% loadedData = load('14.03.2025_FOX_10M_200P_p2q1_newTarDirNewSform_400iter_lap_coil.mat');
+loadedData = load('14.03.2025_VMPFC_10M_200P_p2q1_newTarDirNewSform_500iter_lap_coil.mat');
+%%
+[file, path] = uigetfile({'*.mat', 'MAT-files (*.mat)'}, 'Select a MAT File');
+
+if isequal(file, 0)
+    disp('User canceled file selection.');
+else
+    fullFilePath = fullfile(path, file);
+    disp(['Selected file: ', fullFilePath]);
+
+    % Load the MAT file
+    loadedData = load(fullFilePath); 
+    disp('MAT file loaded successfully.');
+
+  
+end
+
+clear file path fullFilePath
 %%
 app = loadedData.app_data_coil;
 contours = loadedData.contours;
@@ -176,8 +199,8 @@ for i = 1:length(contours)
     contour_points = (contours{i}.points);
     contour_level = (contours{i}.level);
     contour_points_3D = [contour_points; zeros(1, size(contour_points, 2))];
-    coilpath = (contour_points_3D' * app.my_rot) + app.my_coillift;
-    
+    % coilpath = (contour_points_3D' * app.my_rot') + app.my_coillift;
+    coilpath = ( contour_points_3D' * app.my_rot) + app.my_coillift;
     
     % coilpath = (app.my_rot * contour_points_3D)' + app.my_coillift; 
     
@@ -205,7 +228,7 @@ end
 %% Field Plotting Function
 function plotVectorField(coord_array, data_array, Title)
     figure;            
-    currentColormap = colormap(hot);
+    currentColormap = colormap(jet);
     n = 20; % Sampling step
 
     % Create quiver3 plot
@@ -244,24 +267,43 @@ end
 
 %% Get all the fields:
 plotVectorField(app.A_sup, app.A_Aim, 'Target Field'); % Target Field   
-%%
-plotVectorField(app.A_sup, coil_field, 'From Closed Loop Coils'); % Coil Field
+ % % Orientate to get the desired view matrix
+%% Extract the view matrix
+ax = gca;  % Get current axes
+[az, el] = view(ax);  % Extract view angles (azimuth & elevation)
+disp([az, el]); %  -142.3015   16.1799
 
+%%
+
+hold on;
+plotVectorField(app.A_sup, app.A_Aim, 'Target Field'); % Target Field   
+view(-142.3015,   16.1799); 
+hold off;
+%%
+
+hold on;
+plotVectorField(app.A_sup, coil_field, 'From Closed Loop Coils'); % Coil Field
+view(-142.3015,   16.1799); 
+hold off;
 %%
 % app.newcoils_A is the field from the mode decomposition (for all the modes)
 mode_field = app.newcoils_A(:,:,end); % field using max available modes
 plotVectorField(app.A_sup, mode_field, 'Mode Decomposition');
+view(-142.3015,   16.1799); 
 %%
 field = @(myccsum) sum(repmat(reshape(myccsum(:), 1, 1, length(myccsum)),size(app.A_modes, 1), size(app.A_modes, 2), 1) .* app.A_modes, 3);
 optim_field = field(app.opticoeff);
+
+
 plotVectorField(app.A_sup, optim_field, 'Optimised Field');
+view(-142.3015,   16.1799); 
 
 %% Metric Functions
 
 function corr = calculate_corr(field, target_field)
         corr = sum(abs(target_field .* field), 'all');
 end
-
+ 
 function results = energy_in_field(field)
     results = sum(abs(vecnorm(field,2,2)),"all");
 end
