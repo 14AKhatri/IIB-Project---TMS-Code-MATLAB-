@@ -36,8 +36,6 @@ else
     % Load the MAT file
     loadedData = load(fullFilePath); 
     disp('MAT file loaded successfully.');
-
-  
 end
 
 clear file path fullFilePath
@@ -50,7 +48,7 @@ clear loadedData contours
 %%
 % Fill in missing Data - should not need these as sup & vol arrays are
 % filled
-app.roi_radius = 130;
+app.roi_radius = 100;
 app.resolution = 2;
 app.PlanesizeEditField.Value = 200;
 
