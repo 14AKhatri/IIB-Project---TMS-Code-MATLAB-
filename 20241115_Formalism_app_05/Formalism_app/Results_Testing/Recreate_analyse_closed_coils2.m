@@ -23,7 +23,7 @@
 
 % loadedData = load('14.03.2025_AMY_10M_200P_p2q1_newTarDirNewSform_200iter_EE_coil.mat');
 % loadedData = load('14.03.2025_FOX_10M_200P_p2q1_newTarDirNewSform_400iter_lap_coil.mat');
-loadedData = load('14.03.2025_VMPFC_10M_200P_p2q1_newTarDirNewSform_500iter_lap_coil.mat');
+% loadedData = load('14.03.2025_VMPFC_10M_200P_p2q1_newTarDirNewSform_500iter_lap_coil.mat');
 %%
 [file, path] = uigetfile({'*.mat', 'MAT-files (*.mat)'}, 'Select a MAT File');
 
@@ -50,7 +50,7 @@ clear loadedData contours
 % filled
 app.roi_radius = 100;
 app.resolution = 2;
-app.PlanesizeEditField.Value = 200;
+app.PlanesizeEditField.Value = 300;
 
 %% Recreate the current distribution (assumes 10 modes)
 syms x y l m ps %symbolic variables - indicates that they are variables; m & l are mode numbers of sinusoidal functions; ps is planar surface size
