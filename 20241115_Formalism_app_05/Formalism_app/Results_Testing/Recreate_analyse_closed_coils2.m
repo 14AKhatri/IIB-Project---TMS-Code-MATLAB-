@@ -198,7 +198,7 @@ for i = 1:length(contours)
     contour_level = (contours{i}.level);
     contour_points_3D = [contour_points; zeros(1, size(contour_points, 2))];
     % coilpath = (contour_points_3D' * app.my_rot') + app.my_coillift;
-    coilpath = ( contour_points_3D' * app.my_rot) + app.my_coillift;
+    coilpath = (contour_points_3D' * app.my_rot') + app.my_coillift;
     
     % coilpath = (app.my_rot * contour_points_3D)' + app.my_coillift; 
     
