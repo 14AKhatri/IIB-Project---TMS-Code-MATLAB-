@@ -101,9 +101,10 @@ end
 clear file path fullFilePath
 %%
 app = loadedData.app_data_coil;
+clear loadedData
 %%
-app.roi_radius = 100;
-app.resolution = 2;
+% app.roi_radius = 100;
+% app.resolution = 2;
 app.PlanesizeEditField.Value = 300;
 
 %% Recreate the current distribution (assumes 10 modes)
