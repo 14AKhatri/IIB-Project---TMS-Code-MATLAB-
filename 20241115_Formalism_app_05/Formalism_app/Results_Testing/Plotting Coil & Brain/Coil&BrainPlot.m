@@ -130,7 +130,6 @@ clear f_cd
 %%
 x_range = linspace(-app.PlanesizeEditField.Value/2, app.PlanesizeEditField.Value/2, 100); % X-axis
 y_range = linspace(-app.PlanesizeEditField.Value/2, app.PlanesizeEditField.Value/2, 100); % Y-axis
-y_range = flipud(y_range);
 [X, Y] = meshgrid(x_range, y_range); 
 
 Sr = f_cd_numeric(X, (Y)); %use same variables as paper
