@@ -5,7 +5,7 @@ d=[0; 0; 1]; %Normalenvektor zur Ebene
 [x,y] = meshgrid(linspace(-planarsize/2,planarsize/2,gridsize), linspace(-planarsize/2,planarsize/2,gridsize));
 
 W(1:gridsize,1:gridsize,1:m_max*n_max)=zeros;
-z(1:gridsize,1:gridsize)=coillift;
+z(1:gridsize,1:gridsize)=coillift; % Height of plane
 
 
 ii=1;
@@ -35,7 +35,7 @@ clear U1 V1
 
 my_sup(:,1) = reshape(x,[],1);
 my_sup(:,2) = reshape(y,[],1);
-my_sup(:,3) = reshape(z,[],1);
+my_sup(:,3) = reshape(z,[],1); % includes coillift
 
 my_sup = my_sup * my_rot;
 

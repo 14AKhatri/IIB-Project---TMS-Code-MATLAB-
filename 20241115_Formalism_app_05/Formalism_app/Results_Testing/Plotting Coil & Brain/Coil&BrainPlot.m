@@ -1,4 +1,4 @@
-%% 09/05/2025 - Post S.Goetz meeting on 08.05.2025, need to plot the coil ontop of target
+% % 09/05/2025 - Post S.Goetz meeting on 08.05.2025, need to plot the coil ontop of target
 
 %% Load the NIFTI file - the full head model
 [fileName, filePath] = uigetfile('*.nii', 'Select a NIfTI file');
@@ -116,22 +116,24 @@ Y(x,y,l,m,ps) = (sin(l*(x+ps/2)*pi/ps)) .* (sin(m*(y+ps/2)*pi/ps));  % basis fun
 f_cd(x,y) = x + y;
 f_cd(x,y) = 0;
 
-
-for m = 1:10
-    for n = 1:10
+for n = 1:10
+    for m = 1:10
         % Compute mode contribution using symbolic gradient
         % f_cd = f_cd + app.CSUMM(app.lookupinv(m, n), 10) * Y(x,y,m,n,app.PlanesizeEditField.Value);      
-        f_cd = f_cd + app.opticoeff(app.lookupinv(m, n), 1) * Y(x,y,m,n,app.PlanesizeEditField.Value);          
+        f_cd = f_cd + app.opticoeff(app.lookupinv(m, n), 1) * Y(x,y,n,m,app.PlanesizeEditField.Value);      
+        % f_cd = f_cd + app.opticoeff(app.lookupinv(m, n), 1) * Y(x,y,m,n,app.PlanesizeEditField.Value); 
     end
 end
-f_cd_numeric = matlabFunction(f_cd, 'Vars', [x, y]); %convert to Numerical Function - meant to be quicker; converting to double is also a numerical
+f_cd_numeric = matlabFunction(f_cd,'Vars',[x,y]); %convert to Numerical Function - meant to be quicker; converting to double is also a numerical
 %%
 clear f_cd
 %%
 x_range = linspace(-app.PlanesizeEditField.Value/2, app.PlanesizeEditField.Value/2, 100); % X-axis
 y_range = linspace(-app.PlanesizeEditField.Value/2, app.PlanesizeEditField.Value/2, 100); % Y-axis
+y_range = flipud(y_range);
 [X, Y] = meshgrid(x_range, y_range); 
-Sr = f_cd_numeric(X, Y); %use same variables as paper
+
+Sr = f_cd_numeric(X, (Y)); %use same variables as paper
 
 Nw = 30; % No. of windings
 
@@ -142,7 +144,7 @@ Sr_max = max(Sr(:));
 % contour line
 Lk = Sr_min + ((1:Nw) - (1/2)) * (Sr_max - Sr_min) / Nw; % produces a vector of levels
 
-C = contourc(x_range, y_range, Sr, Lk);
+C = contourc(x_range, (y_range), (Sr), Lk);
                 
 % Iterate through  + find points in each contour line
 contours = {}; % array for paths for each Lk step
@@ -157,7 +159,9 @@ end
 
 figure;
 hold on;
-imagesc(x_range, y_range, Sr); % Plot the stream function as a heatmap
+imagesc(x_range, y_range, (Sr)); % Plot the stream function as a heatmap
+set(gca, 'YDir', 'reverse');
+
 colormap(jet);
 colorbar;
 for i = 1:length(contours)
@@ -167,8 +171,10 @@ end
 %title('Stream Function & Equally Spaced Coil Windings using Optimised Coefficients');
 title('Post-Optimisation Current Distribution');
 % title('Pre-Optimisation Current Distribution');
-xlabel('X');
-ylabel('Y');
+xlabel('X (mm)');
+ylabel('Y (mm)');
+% [~, h] = contour(x_range, y_range, Sr, Lk);
+% clabel(C, h);
 axis equal;
 hold off;
 
@@ -199,14 +205,16 @@ hold on;
 
 for i = 1:length(contours)
     contour_points = contours{i}.points; % Contour points in 2D
-    contour_points = contour_points([2, 1], :);
-
-    Rz_90 = eul2rotm([0 0 deg2rad(-90)], 'XYZ');
-
+    % contour_points = contour_points([2, 1], :);
     contour_points_3D = [contour_points; zeros(1, size(contour_points, 2))]; % Convert to 3D points
     % transformed_points = (app.my_rot * contour_points_3D); 
     % transformed_points = (contour_points_3D' * app.my_rot'); 
-    coilpath = (contour_points_3D.' * (app.my_rot)) + app.my_coillift;
+
+    z_lift = 100;  % Desired height
+    % contour_points_3D = [contour_points; z_lift * ones(1, size(contour_points, 2))];
+    coilpath = (contour_points_3D' * (app.my_rot)) + app.my_coillift;
+
+    % coilpath = (app.my_rot * contour_points_3D);% + app.my_coillift;
     % coilpath = (contour_points_3D) + app.my_coillift';
     coilpath = coilpath';
     
