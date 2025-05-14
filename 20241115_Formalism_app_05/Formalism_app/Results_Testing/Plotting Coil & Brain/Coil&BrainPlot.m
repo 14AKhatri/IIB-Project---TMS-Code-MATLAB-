@@ -276,7 +276,7 @@ for i = 1:length(contours)
     contour_points = (contours{i}.points);
     contour_level = (contours{i}.level);
     
-    contour_points = contour_points([2, 1], :);
+    % contour_points = contour_points([2, 1], :);
     contour_points_3D = [contour_points; zeros(1, size(contour_points, 2))]; % Convert to 3D points
     
     coilpath = (contour_points_3D' * (app.my_rot)) + app.my_coillift;
@@ -338,6 +338,7 @@ function plotVectorField(coord_array, data_array, Title)
 
     % Add labels and title
     title(Title);
+    view(-142.3015,   16.1799); 
     xlabel('X');
     ylabel('Y');
     zlabel('Z');
@@ -345,11 +346,11 @@ function plotVectorField(coord_array, data_array, Title)
 end
 %%
 plotVectorField(app.A_sup, app.A_Aim, 'Target Field'); % Target Field 
-view(-142.3015,   16.1799); 
+% view(-142.3015,   16.1799); 
 %%
 hold on;
 plotVectorField(app.A_sup, coil_field.*10, 'From Closed Loop Coils'); % Coil Field
-view(-142.3015,   16.1799); 
+% view(-142.3015,   16.1799); 
 hold off;
 %%
 field = @(myccsum) sum(repmat(reshape(myccsum(:), 1, 1, length(myccsum)),size(app.A_modes, 1), size(app.A_modes, 2), 1) .* app.A_modes, 3);
