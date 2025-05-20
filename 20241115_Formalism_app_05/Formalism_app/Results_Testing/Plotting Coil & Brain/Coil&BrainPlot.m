@@ -1,4 +1,4 @@
-% % 09/05/2025 - Post S.Goetz meeting on 08.05.2025, need to plot the coil ontop of target
+%% 09/05/2025 - Post S.Goetz meeting on 08.05.2025, need to plot the coil ontop of target
 
 %% Load the NIFTI file - the full head model
 [fileName, filePath] = uigetfile('*.nii', 'Select a NIfTI file');
@@ -227,10 +227,24 @@ for i = 1:length(contours)
    plot3(coilpath(1, :), coilpath(2, :), coilpath(3, :), plot_colour, 'LineWidth', 1)
 end
 
+
+normal_vec = app.my_coillift(:);              % ensure column vector
+normal_vec = normal_vec / norm(normal_vec);   % normalize
+
+x = normal_vec(1);
+y = normal_vec(2);
+z = normal_vec(3);
+
+az = atan2d(y, x);             % azimuth: angle in XY plane from X axis
+el = asind(z);                 % elevation: arcsin of Z component
+
+view(el, az)
+
+
 title('Stream Function & Equally Spaced Coil Windings using Optimised Coefficients');
 xlabel('X');
 ylabel('Y');
-view(-142.3015,   16.1799); 
+% view(-142.3015,   16.1799); 
 axis equal;
 hold off;
 
