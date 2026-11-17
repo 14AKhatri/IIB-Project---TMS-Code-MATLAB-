@@ -401,9 +401,99 @@ function magcorr = energy_in_target(field, target_field)
          magcorr = sum((target_field_binmap .* abs(vecnorm(field,2,2))), 'all');
 end
 
+%%%%%
+%%
+function A_squared_sum = energy_in_target2(field, target_field)
+        % Returns the sum of the squared magnitudes of the A-field within the target region.
+        %
+        % Inputs:
+        %   field:         N x D matrix representing the A-field (or any vector field),
+        %                  where N is the number of points and D is the dimension (e.g., 3 for 3D).
+        %   target_field:  N x M matrix (or similar) where non-zero rows indicate
+        %                  points within the target region. This is used to create
+        %                  a binary map of the target area.
+        %
+        % Output:
+        %   A_squared_sum: The sum of |A|^2 for all points within the target region.
+
+        % Create a binary map of the target region
+        % A row is considered part of the target if any of its elements are non-zero.
+        target_field_binmap = any(target_field ~= 0, 2);
+
+        % Calculate the squared magnitude of each vector in 'field'
+        % vecnorm(field, 2, 2) calculates the L2-norm (magnitude) for each row.
+        % Then, we square that result.
+        A_squared_per_point = (vecnorm(field, 2, 2)).^2;
+
+        % Apply the binary map to select only the points within the target region
+        % and then sum their A_squared values.
+        A_squared_sum = sum(target_field_binmap .* A_squared_per_point, 'all');
+end
+
+function A_squared_sum = energy_in_field2(field)
+    % Returns the sum of the squared magnitudes of the A-field over the entire field.
+    %
+    % Inputs:
+    %   field:  N x D matrix representing the A-field (or any vector field),
+    %           where N is the number of points and D is the dimension (e.g., 3 for 3D).
+    %
+    % Output:
+    %   A_squared_sum: The sum of |A|^2 for all points in the 'field'.
+
+    % Calculate the squared magnitude of each vector in 'field'
+    % vecnorm(field, 2, 2) calculates the L2-norm (magnitude) for each row.
+    % Then, we square that result.
+    A_squared_per_point = (vecnorm(field, 2, 2)).^2;
+
+    % Sum all the calculated squared magnitudes
+    A_squared_sum = sum(A_squared_per_point, 'all');
+end
+%%%%%%%%%%%%%%%%
+%%
+
 %%
 optim_field_correlation_target = calculate_corr(optim_field,app.A_Aim);
 fprintf('Correlation of Target with Optimised Field: %.2f J\n', optim_field_correlation_target);
 
 coil_field_correlation_target = calculate_corr(coil_field,app.A_Aim);
 fprintf('Correlation of Target with Coil Field: %.2f J\n', coil_field_correlation_target*1000000);
+
+%%
+%%
+%%
+%% Energy Calculations
+energy_targ = energy_in_field(app.A_Aim);
+fprintf('Target Energy: %.2f J\n', energy_targ);
+
+% mode_field_energy = energy_in_field(mode_field);
+% fprintf('Mode Field Energy: %.2f J\n', mode_field_energy);
+
+energy_optim_field = energy_in_field2(optim_field);
+fprintf('Optimised Field Energy: %.2f J\n', energy_optim_field);
+
+energy_coil_field = energy_in_field(coil_field);
+fprintf('Coil Field Energy: %.2f J\n', energy_coil_field*1000000);
+
+fprintf('Coil Field Energy: %.2f J\n', energy_coil_field*1000000);
+%% Target Correlation Calculations
+correlation_target_targ_ = calculate_corr(app.A_Aim,app.A_Aim);
+fprintf('Correlation of Target with itself: %.2f J\n', correlation_target_targ_);
+% 
+% mode_field_correlation_target = calculate_corr(mode_field,app.A_Aim);
+% fprintf('Correlation of Target with Mode Field: %.2f J\n', mode_field_correlation_target);
+
+correlation_target_optim_field = calculate_corr(optim_field,app.A_Aim);
+fprintf('Correlation of Target with Optimised Field: %.2f J\n', correlation_target_optim_field);
+
+correlation_target_coil_field = calculate_corr(coil_field,app.A_Aim);
+fprintf('Correlation of Target with Coil Field: %.2f J\n', correlation_target_coil_field*1000000);
+
+%% Energy in Target
+energy_in_target_target = energy_in_target(app.A_Aim,app.A_Aim)
+% mode_field_energy_in_target = energy_in_target(mode_field, app.A_Aim)
+energy_in_target_optim_field = energy_in_target2(optim_field, app.A_Aim)
+energy_in_target_coil_field = energy_in_target(coil_field, app.A_Aim)
+
+% fprintf('Mode Field Energy in Target: %.2f J\n', mode_field_energy_in_target);
+fprintf('Optim Field Energy in Target: %.2f J\n', energy_in_target_optim_field);
+fprintf('Coil Field Energy in Target: %.2f J\n', energy_in_target_coil_field*1000000);

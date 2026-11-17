@@ -2,7 +2,7 @@
 % load('closed_loop_data.mat');
 
 % loadedData = load('closed_loop_data.mat');
-loadedData = load('test_save.mat');
+loadedData = load('01_14.02.2025_run_coil.mat');
 % app = loadedData.app;
 % Assign back to app properties
 % app.planarflag = planarflag;
